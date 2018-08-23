@@ -1,0 +1,85 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<style>
+		body {
+			overflow	: hidden;
+			padding		: 0;
+			margin		: 0;
+			background-color: #BBB;
+		}
+		#info {
+			position	: absolute;
+			top		: 0px;
+			width		: 100%;
+			padding		: 5px;
+			text-align	: center;
+		}
+		#info a {
+			color		: #66F;
+			text-decoration	: none;
+		}
+		#info a:hover {
+			text-decoration	: underline;
+		}
+		#container {
+			width		: 100%;
+			height		: 100%;
+			overflow	: hidden;
+			padding		: 0;
+			margin		: 0;
+			-webkit-user-select	: none;
+			-moz-user-select	: none;
+		}
+		</style>
+
+	</head>
+	<body>
+		<div id="container"></div>
+        
+		<div id="info">
+            <b>SE KMITL | Wifi Car</b>
+            <br/>
+			Touch the screen and move
+			<br/>
+			<span id="result"></span>
+		</div> 
+		<script src="./virtualjoystick.js"></script>
+		<script>
+			console.log("touchscreen is", VirtualJoystick.touchScreenAvailable() ? "available" : "not available");
+	
+			var joystick	= new VirtualJoystick({
+				container	: document.getElementById('container'),
+				mouseSupport	: true,
+				limitStickTravel	: true,
+			});
+			joystick.addEventListener('touchStart', function(){
+				console.log('down')
+			})
+			joystick.addEventListener('touchEnd', function(){
+				console.log('up')
+			})
+			var prevX = 0;
+			var prevY = 0;
+			var newX = 0;
+			var newY = 0;
+			setInterval(function(){
+				var outputEl	= document.getElementById('result');
+				newX = Math.round(joystick.deltaX());
+				newY = Math.round(joystick.deltaY()) * -1;
+				outputEl.innerHTML	= '<b>Position:</b> '
+					+ ' X:'+newX
+					+ ' Y:'+newY;
+				if ( newX != prevX || newY != prevY ){
+					var xhr = new XMLHttpRequest();
+					xhr.open('PUT', "./jsData.html?x="+newX+"&y="+newY)
+					xhr.send();
+				}
+				prevX = newX;
+				prevY = newY;
+			}, 1/30 * 1000);
+		</script>
+	</body>
+</html>
